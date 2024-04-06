@@ -1,19 +1,16 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use std::collections::HashMap;
-
 #[tauri::command]
-async fn execute_request(url: &str) -> Result<String, ()> {
+async fn execute_request(url: &str) -> Result<serde_json::Value, ()> {
     let resp = reqwest::get(url)
         .await
         .expect("must have response")
-        .json::<HashMap<String, String>>()
+        .json::<serde_json::Value>()
         .await
         .expect("must be map");
 
-    let result = serde_json::to_string(&resp).expect("must serialize");
-    Ok(result)
+    Ok(resp)
 }
 
 fn main() {
