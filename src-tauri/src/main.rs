@@ -4,13 +4,15 @@
 use std::collections::HashMap;
 
 #[tauri::command]
-async fn execute_request(url: &str) -> Result<String> {
+async fn execute_request(url: &str) -> Result<String, ()> {
     let resp = reqwest::get(url)
-        .await?
+        .await
+        .expect("must have response")
         .json::<HashMap<String, String>>()
-        .await?;
+        .await
+        .expect("must be map");
 
-    let result = serde_json::to_string(&resp)?;
+    let result = serde_json::to_string(&resp).expect("must serialize");
     Ok(result)
 }
 
