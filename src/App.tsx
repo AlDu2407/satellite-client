@@ -1,28 +1,17 @@
-import { useEffect, useState } from "react";
-import ModeSwitcher from "./common/ModeSwitcher";
-import RequestView from "./request/RequestView";
-import "./styles/global.css";
+import { ThemeProvider } from "@/components/theme/provider";
+import RequestView from "@/views/request";
+import { ModeToggle } from "./components/theme/toggle";
 
 const App = () => {
-  const defaultStyles = "h-full w-full";
-  const [styles, setStyles] = useState<string>("");
-  const [mode, setMode] = useState<string>("light");
-
-  const onModeChange = () => {
-    setMode((previousMode) => (previousMode == "light" ? "dark" : "light"));
-  };
-
-  useEffect(() => {
-    setStyles(`${mode} ${defaultStyles}`);
-  }, [mode]);
-
   return (
-    <div className={styles}>
-      <div className="inline-flex w-screen bg-white text-lg text-gray-500 dark:bg-gray-900 dark:text-gray-400">
-        <ModeSwitcher mode={mode} onChange={onModeChange} />
-      </div>
-      <RequestView />
-    </div>
+    <ThemeProvider defaultTheme="light" storageKey="satellite-client-ui-theme">
+      <header className="flex h-[10%] w-full justify-end px-4 py-2">
+        <ModeToggle />
+      </header>
+      <main className="h-[90%] p-4">
+        <RequestView />
+      </main>
+    </ThemeProvider>
   );
 };
 
