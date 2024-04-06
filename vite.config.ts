@@ -7,7 +7,7 @@ export default defineConfig(async () => ({
   css: {
     postcss: {
       plugins: [tailwindcss()],
-    }
+    },
   },
 
   plugins: [react()],
