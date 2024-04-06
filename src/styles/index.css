@@ -1,0 +1,6 @@
+html,
+body,
+div#root,
+div.app {
+  height: 100%;
+}
