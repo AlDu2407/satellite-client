@@ -1,3 +1,4 @@
+import { executeGet } from "@/commands/tauriCommands";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -9,7 +10,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { invoke } from "@tauri-apps/api";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -29,8 +29,12 @@ const RequestView = () => {
   });
 
   async function onSubmit({ url }: z.infer<typeof urlForm>) {
-    const result = await invoke("execute_request", { url: url });
-    setResult(result);
+    try {
+      const response = await executeGet(url, false);
+      setResult(response);
+    } catch (exception) {
+      setResult(undefined);
+    }
   }
 
   return (
