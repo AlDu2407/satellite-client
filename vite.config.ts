@@ -1,4 +1,6 @@
+import MillionCompiler from "@million/lint";
 import react from "@vitejs/plugin-react";
+import million from "million/compiler";
 import { resolve } from "path";
 import tailwindcss from "tailwindcss";
 import { defineConfig } from "vite";
@@ -11,7 +13,7 @@ export default defineConfig(async () => ({
     },
   },
 
-  plugins: [react()],
+  plugins: [million.vite({ auto: true }), MillionCompiler.vite(), react()],
 
   resolve: {
     alias: {
