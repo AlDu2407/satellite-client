@@ -1,16 +1,26 @@
+import { SatelliteError } from "@/types/generated/error";
+import { Request } from "@/types/generated/request";
+import { JsonValue } from "@/types/generated/serde_json/JsonValue";
 import { invoke } from "@tauri-apps/api";
-import { SCRequest, SCRequestType } from "../types/request";
-import { SCResponse } from "../types/response";
+import { InvokeArgs } from "@tauri-apps/api/tauri";
 
-export const executeGet = async (
-  url: string,
-  secure: boolean
-): Promise<SCResponse> => {
-  let request: SCRequest = {
-    type: SCRequestType.GET,
-    url,
-    secure,
+export const isSatelliteErr = (err: unknown): err is SatelliteError => {
+  return (
+    typeof err === "object" &&
+    err !== null &&
+    "error" in err &&
+    "message" in err
+  );
+};
+
+const createCmd =
+  <TArgs extends InvokeArgs, TResp>(cmd: string, key: string) =>
+  async (args: TArgs): Promise<TResp> => {
+    return await invoke<TResp>(cmd, { [key]: args });
   };
 
-  return await invoke("execute_request", { request: request });
+const request = createCmd<Request, JsonValue>("execute_request", "request");
+
+export const Commands = {
+  request,
 };

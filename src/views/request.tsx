@@ -1,4 +1,4 @@
-import { executeGet } from "@/commands/tauriCommands";
+import { Commands, isSatelliteErr } from "@/commands/tauriCommands";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -30,10 +30,18 @@ const RequestView = () => {
 
   async function onSubmit({ url }: z.infer<typeof urlForm>) {
     try {
-      const response = await executeGet(url, false);
+      const response = await Commands.request({
+        method: "GET",
+        url,
+        secure: true,
+      });
       setResult(response);
-    } catch (exception) {
-      setResult(undefined);
+    } catch (err) {
+      if (isSatelliteErr(err)) {
+        setResult(err);
+      } else {
+        setResult(undefined);
+      }
     }
   }
 
