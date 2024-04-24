@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
-use serde::Deserialize;
 use serde::ser::SerializeStruct;
+use serde::Deserialize;
 
 use super::{rest::SatelliteError, status::ResponseStatus};
 
