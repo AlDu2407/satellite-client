@@ -1,4 +1,4 @@
-import { Commands, isSatelliteErr } from "@/commands/tauriCommands";
+import { Commands } from "@/commands/tauriCommands";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -29,13 +29,27 @@ const urlForm = z.object({
   body: z.string(),
 });
 
-type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
+type HttpMethod =
+  | "GET"
+  | "POST"
+  | "PUT"
+  | "DELETE"
+  | "HEAD"
+  | "CONNECT"
+  | "OPTIONS"
+  | "TRACE"
+  | "PATCH";
 
 const SUPPORTED_HTTP_METHODS: HttpMethod[] = [
   "GET",
   "POST",
   "PUT",
   "DELETE",
+  "HEAD",
+  "CONNECT",
+  "OPTIONS",
+  "TRACE",
+  "PATCH",
 ] as const;
 
 const RequestView = () => {
@@ -67,16 +81,12 @@ const RequestView = () => {
       const response = await Commands.request(request);
       setResult(response);
     } catch (err) {
-      if (isSatelliteErr(err)) {
-        setResult(err);
-      } else {
-        setResult(undefined);
-      }
+      setResult(err);
     }
   }
 
   const canContainBody = () => {
-    return method === "POST" || method === "PUT";
+    return method === "POST" || method === "PUT" || method === "PATCH";
   };
 
   useEffect(() => {
@@ -153,8 +163,10 @@ const RequestView = () => {
                   control={form.control}
                   name="body"
                   render={({ field }) => (
-                    <FormItem className="grow rounded-lg bg-muted p-4">
-                      <FormLabel htmlFor="request-payload">Body</FormLabel>
+                    <FormItem className="h-full rounded-lg bg-muted p-4">
+                      <FormLabel className="text-xl" htmlFor="request-payload">
+                        Body
+                      </FormLabel>
                       <FormControl>
                         <Textarea id="request-payload" {...field} />
                       </FormControl>
@@ -166,11 +178,13 @@ const RequestView = () => {
           </div>
         </form>
       </Form>
-      <div className="grow overflow-y-scroll rounded-lg bg-muted p-4">
-        <Label htmlFor="response-payload">Response</Label>
+      <div className="h-full rounded-lg bg-muted p-4">
+        <Label className="text-xl" htmlFor="response-payload">
+          Response
+        </Label>
         <Textarea
           id="reponse-content"
-          className="h-full"
+          className="mt-2 h-[calc(100%-2rem)] text-lg"
           value={responseText}
         />
       </div>

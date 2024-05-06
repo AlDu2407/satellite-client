@@ -1,9 +1,24 @@
 use std::collections::HashMap;
 
 use serde::ser::SerializeStruct;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-use super::{rest::SatelliteError, status::ResponseStatus};
+use super::status::ResponseStatus;
+
+#[derive(Serialize, ts_rs::TS)]
+#[ts(export)]
+#[ts(export_to = "error.ts")]
+#[serde(tag = "type", content = "error")]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum SatelliteError {
+    ClientError(String),
+}
+
+impl From<reqwest::Error> for SatelliteError {
+    fn from(err: reqwest::Error) -> Self {
+        SatelliteError::ClientError(err.to_string())
+    }
+}
 
 #[derive(Debug, Deserialize, ts_rs::TS)]
 #[ts(export)]
@@ -12,11 +27,13 @@ pub struct SatelliteResponse {
     pub code: u16,
     pub status: ResponseStatus,
     pub headers: HashMap<String, String>,
-    pub body: serde_json::Value,
+    pub body: Option<serde_json::Value>,
 }
 
 impl SatelliteResponse {
-    pub async fn from_response(value: reqwest::Response) -> Result<Self, SatelliteError> {
+    pub async fn from_response(
+        value: reqwest::Response,
+    ) -> std::result::Result<Self, SatelliteError> {
         let headers = value
             .headers()
             .iter()
@@ -28,17 +45,23 @@ impl SatelliteResponse {
             })
             .collect();
 
+        let code = value.status().as_u16();
+        let body = match value.json().await {
+            Ok(body) => Some(body),
+            Err(_) => None,
+        };
+
         Ok(Self {
-            code: value.status().as_u16(),
-            status: ResponseStatus::from(value.status().as_u16()),
-            body: value.json().await?,
+            code,
+            status: ResponseStatus::from(code),
+            body,
             headers,
         })
     }
 }
 
 impl serde::ser::Serialize for SatelliteResponse {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
@@ -50,3 +73,5 @@ impl serde::ser::Serialize for SatelliteResponse {
         response.end()
     }
 }
+
+pub type Result<SatelliteResponse> = std::result::Result<SatelliteResponse, SatelliteError>;
