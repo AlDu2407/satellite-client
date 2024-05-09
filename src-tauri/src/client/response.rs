@@ -31,9 +31,7 @@ pub struct SatelliteResponse {
 }
 
 impl SatelliteResponse {
-    pub async fn from_response(
-        value: reqwest::Response,
-    ) -> std::result::Result<Self, SatelliteError> {
+    pub async fn from_response(value: reqwest::Response) -> Result<Self> {
         let headers = value
             .headers()
             .iter()

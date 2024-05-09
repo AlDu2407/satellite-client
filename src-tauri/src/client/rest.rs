@@ -35,14 +35,14 @@ async fn execute_post(request: &PostReq) -> Result<SatelliteResponse> {
         .send()
         .await?;
 
-    Ok(SatelliteResponse::from_response(response).await?)
+    SatelliteResponse::from_response(response).await
 }
 
 async fn execute_get(request: &GetReq) -> Result<SatelliteResponse> {
     let client = create_client();
     let response = client.get(&request.base.prefixed_url()).send().await?;
 
-    Ok(SatelliteResponse::from_response(response).await?)
+    SatelliteResponse::from_response(response).await
 }
 
 async fn execute_put(request: &PutReq) -> Result<SatelliteResponse> {
@@ -53,14 +53,14 @@ async fn execute_put(request: &PutReq) -> Result<SatelliteResponse> {
         .send()
         .await?;
 
-    Ok(SatelliteResponse::from_response(response).await?)
+    SatelliteResponse::from_response(response).await
 }
 
 async fn execute_delete(request: &DeleteReq) -> Result<SatelliteResponse> {
     let client = create_client();
     let response = client.delete(&request.base.prefixed_url()).send().await?;
 
-    Ok(SatelliteResponse::from_response(response).await?)
+    SatelliteResponse::from_response(response).await
 }
 
 async fn execute_patch(request: &PatchReq) -> Result<SatelliteResponse> {
@@ -71,14 +71,14 @@ async fn execute_patch(request: &PatchReq) -> Result<SatelliteResponse> {
         .send()
         .await?;
 
-    Ok(SatelliteResponse::from_response(response).await?)
+    SatelliteResponse::from_response(response).await
 }
 
 async fn execute_head(request: &HeadReq) -> Result<SatelliteResponse> {
     let client = create_client();
     let response = client.head(&request.base.prefixed_url()).send().await?;
 
-    Ok(SatelliteResponse::from_response(response).await?)
+    SatelliteResponse::from_response(response).await
 }
 
 async fn execute_connect(request: &ConnectReq) -> Result<SatelliteResponse> {
@@ -88,7 +88,7 @@ async fn execute_connect(request: &ConnectReq) -> Result<SatelliteResponse> {
         .send()
         .await?;
 
-    Ok(SatelliteResponse::from_response(response).await?)
+    SatelliteResponse::from_response(response).await
 }
 
 async fn execute_options(request: &OptionsReq) -> Result<SatelliteResponse> {
@@ -98,7 +98,7 @@ async fn execute_options(request: &OptionsReq) -> Result<SatelliteResponse> {
         .send()
         .await?;
 
-    Ok(SatelliteResponse::from_response(response).await?)
+    SatelliteResponse::from_response(response).await
 }
 
 async fn execute_trace(request: &TraceReq) -> Result<SatelliteResponse> {
@@ -107,5 +107,5 @@ async fn execute_trace(request: &TraceReq) -> Result<SatelliteResponse> {
         .send()
         .await?;
 
-    Ok(SatelliteResponse::from_response(response).await?)
+    SatelliteResponse::from_response(response).await
 }

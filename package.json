@@ -10,6 +10,7 @@
     "tauri": "tauri",
     "check-types": "tsc --noEmit",
     "format": "prettier --write ./src/",
+    "format:be": "prettier --write ./src-tauri/",
     "format:check": "prettier --check ."
   },
   "dependencies": {

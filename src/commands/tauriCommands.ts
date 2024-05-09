@@ -1,15 +1,12 @@
 import { SatelliteError } from "@/types/generated/error";
 import { Request } from "@/types/generated/request";
-import { JsonValue } from "@/types/generated/serde_json/JsonValue";
+import { SatelliteResponse } from "@/types/generated/response";
 import { invoke } from "@tauri-apps/api";
 import { InvokeArgs } from "@tauri-apps/api/tauri";
 
 export const isSatelliteErr = (err: unknown): err is SatelliteError => {
   return (
-    typeof err === "object" &&
-    err !== null &&
-    "error" in err &&
-    "message" in err
+    typeof err === "object" && err !== null && "type" in err && "error" in err
   );
 };
 
@@ -19,7 +16,10 @@ const createCmd =
     return await invoke<TResp>(cmd, { [key]: args });
   };
 
-const request = createCmd<Request, JsonValue>("execute_request", "request");
+const request = createCmd<Request, SatelliteResponse>(
+  "execute_request",
+  "request"
+);
 
 export const Commands = {
   request,
