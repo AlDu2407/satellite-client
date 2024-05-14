@@ -18,30 +18,49 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { SatelliteError } from "@/types/generated/error";
 import { Request } from "@/types/generated/request";
+import { SatelliteResponse } from "@/types/generated/response";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import ResponseArea from "./components/response-area";
 
 const urlForm = z.object({
   url: z.string().url(),
   body: z.string(),
 });
 
-type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
+type HttpMethod =
+  | "GET"
+  | "POST"
+  | "PUT"
+  | "DELETE"
+  | "HEAD"
+  | "CONNECT"
+  | "OPTIONS"
+  | "TRACE"
+  | "PATCH";
 
 const SUPPORTED_HTTP_METHODS: HttpMethod[] = [
   "GET",
   "POST",
   "PUT",
   "DELETE",
+  "HEAD",
+  "CONNECT",
+  "OPTIONS",
+  "TRACE",
+  "PATCH",
 ] as const;
 
 const RequestView = () => {
-  const [result, setResult] = useState<any | undefined>(undefined);
   const [method, setMethod] = useState<HttpMethod>(SUPPORTED_HTTP_METHODS[0]);
-  const [responseText, setResponseText] = useState<string>("");
+  const [response, setResponse] = useState<SatelliteResponse | undefined>(
+    undefined
+  );
+  const [error, setError] = useState<SatelliteError | undefined>(undefined);
 
   const form = useForm<z.infer<typeof urlForm>>({
     resolver: zodResolver(urlForm),
@@ -65,27 +84,20 @@ const RequestView = () => {
       ) as Request;
 
       const response = await Commands.request(request);
-      setResult(response);
+      setError(undefined);
+      setResponse(response);
     } catch (err) {
       if (isSatelliteErr(err)) {
-        setResult(err);
-      } else {
-        setResult(undefined);
+        setError(err);
+        setResponse(undefined);
       }
+      // setError(err);
     }
   }
 
   const canContainBody = () => {
-    return method === "POST" || method === "PUT";
+    return method === "POST" || method === "PUT" || method === "PATCH";
   };
-
-  useEffect(() => {
-    if (result) {
-      setResponseText(JSON.stringify(result, undefined, 2));
-    } else {
-      setResponseText("");
-    }
-  }, [result]);
 
   return (
     <div className="flex h-full flex-col">
@@ -153,10 +165,16 @@ const RequestView = () => {
                   control={form.control}
                   name="body"
                   render={({ field }) => (
-                    <FormItem className="grow rounded-lg bg-muted p-4">
-                      <FormLabel htmlFor="request-payload">Body</FormLabel>
+                    <FormItem className="h-full rounded-lg bg-muted p-4">
+                      <FormLabel className="text-xl" htmlFor="request-payload">
+                        Body
+                      </FormLabel>
                       <FormControl>
-                        <Textarea id="request-payload" {...field} />
+                        <Textarea
+                          className="mt-2 h-[calc(100%-2rem)] resize-none overflow-auto text-lg"
+                          id="request-payload"
+                          {...field}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -166,13 +184,18 @@ const RequestView = () => {
           </div>
         </form>
       </Form>
-      <div className="grow overflow-y-scroll rounded-lg bg-muted p-4">
-        <Label htmlFor="response-payload">Response</Label>
-        <Textarea
-          id="reponse-content"
-          className="h-full"
-          value={responseText}
-        />
+      <div className="h-full rounded-lg bg-muted p-4">
+        <Label className="text-xl" htmlFor="response-payload">
+          Response
+        </Label>
+        <div id="reponse-content" className="h-full">
+          <ResponseArea response={response} />
+          {error && (
+            <div className="text-2xl font-extrabold text-red-500">
+              {JSON.stringify(error)}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
