@@ -26,6 +26,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import ResponseArea from "./components/response-area";
+import ParameterArea from "./components/parameter-area";
 
 const urlForm = z.object({
   url: z.string().url(),
@@ -70,6 +71,8 @@ const RequestView = () => {
     },
   });
 
+  const watchUrl = form.watch("url");
+
   async function onSubmit({ url, body }: z.infer<typeof urlForm>) {
     try {
       const request = (
@@ -98,6 +101,8 @@ const RequestView = () => {
   const canContainBody = () => {
     return method === "POST" || method === "PUT" || method === "PATCH";
   };
+
+  const handleUrlUpdate = (url: string) => {};
 
   return (
     <div className="flex h-full flex-col">
@@ -128,7 +133,7 @@ const RequestView = () => {
               render={({ field }) => (
                 <>
                   <FormItem className="mx-2 flex w-full items-center">
-                    <FormLabel className="text-lg">Url</FormLabel>
+                    <FormLabel className="pr-2 text-lg">Url</FormLabel>
                     <FormControl>
                       <Input placeholder="request url..." {...field} />
                     </FormControl>
@@ -152,7 +157,7 @@ const RequestView = () => {
                 value="parameters"
                 className="border-none p-0 outline-none"
               >
-                <div>Parameters Tab</div>
+                <ParameterArea url={watchUrl} updateUrl={handleUrlUpdate} />
               </TabsContent>
               <TabsContent
                 value="headers"
